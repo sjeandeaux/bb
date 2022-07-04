@@ -1,24 +1,38 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Project {
     pub key: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Repository {
     pub slug: String,
     pub name: Option<String>,
     pub project: Project,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Reference {
     // "refs/heads/<branch name>"
     pub id: String,
     pub repository: Repository,
 }
 
+impl Repository {
+    pub fn new(url: String) -> Self {
+        let re = Regex::new(r"(http.?)://(.*)/scm/(.*)/(.*)\.git").unwrap();
+        let caps = re.captures(&url).unwrap();
+        Repository {
+            slug: caps.get(4).map(|v| v.as_str().to_string()).unwrap(),
+            name: caps.get(4).map(|v| v.as_str().to_string()),
+            project: Project {
+                key: caps.get(3).map(|v| v.as_str().to_string()).unwrap(),
+            },
+        }
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::{Project, Reference, Repository};
