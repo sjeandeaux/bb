@@ -1,4 +1,3 @@
-
 use super::pull_request::PullRequest;
 
 pub struct Client {
@@ -14,17 +13,24 @@ impl Client {
     pub fn endpoint_pull_request(&self, pull_request: &PullRequest) -> String {
         return format!("{protocol}://{hostname}/rest/api/1.0/projects/{project}/repos/{repository}/pull-requests", 
                             protocol = self.protocol.as_ref().unwrap_or(&String::from("https")),
-                            hostname = self.hostname, 
-                            project = pull_request.to_ref.repository.project.key, 
+                            hostname = self.hostname,
+                            project = pull_request.to_ref.repository.project.key,
                             repository = pull_request.to_ref.repository.name.as_ref().unwrap());
     }
 
-    pub async fn create_pull_request(&self, pull_request: &PullRequest) -> Result<PullRequest, reqwest::Error>{
+    pub async fn create_pull_request(
+        &self,
+        pull_request: &PullRequest,
+    ) -> Result<PullRequest, reqwest::Error> {
         let client = reqwest::Client::new();
-        let res : PullRequest = client
-                            .post(self.endpoint_pull_request(pull_request))
-                            .basic_auth(&self.username, Some(&self.token))
-                            .json(&pull_request).send().await?.json().await?;
+        let res: PullRequest = client
+            .post(self.endpoint_pull_request(pull_request))
+            .basic_auth(&self.username, Some(&self.token))
+            .json(&pull_request)
+            .send()
+            .await?
+            .json()
+            .await?;
 
         return Ok(res);
     }
