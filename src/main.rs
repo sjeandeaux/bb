@@ -7,5 +7,7 @@ use git::git::last_commit_sha;
 mod api;
 mod git;
 fn main() {
-    println!("{:?}", last_commit_sha().expect("error").commit_body())
+    let commit = last_commit_sha().expect("error");
+
+    println!("{:?} {:?}", (&commit), (&commit).commit_body())
 }

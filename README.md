@@ -3,6 +3,7 @@
 ## TODOs
 
 - [] best practices (unit tests, comment, ...)
+- [] borrow or not borrow 
 
 ## Technology
 

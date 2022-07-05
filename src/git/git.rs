@@ -15,8 +15,9 @@ impl Commit {
     /// ```
     /// use 
     /// ```
-    pub fn commit_body(self) -> Result<String, Box<dyn Error>> {
-        return lookup_commit(self.sha, String::from("%b"));
+    pub fn commit_body(&self) -> Result<String, Box<dyn Error>> {
+        let sha = &(self).sha;
+        return lookup_commit(sha.to_string(), String::from("%b"));
     }
 }
 
