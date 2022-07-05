@@ -1,8 +1,12 @@
 # bb
 
+## TODOs
+
+- [] best practices (unit tests, comment, ...)
+
 ## Technology
 
-This cli is implemented is `Rust`.
+This cli is implemented **Rust**.
 
 ## Description
 

@@ -1,13 +1,23 @@
-use std::{
-    error::Error,
-    process::Command,
-};
+use std::{error::Error, process::Command};
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
+/// A commit its sha and its title
 pub struct Commit {
     pub sha: String,
     pub title: String,
+}
+
+impl Commit {
+    /// Returns the body commit
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use 
+    /// ```
+    pub fn commit_body(self) -> Result<String, Box<dyn Error>> {
+        return lookup_commit(self.sha, String::from("%b"));
+    }
 }
 
 pub fn last_commit_sha() -> Result<Commit, Box<dyn Error>> {
@@ -18,12 +28,6 @@ pub fn last_commit_sha() -> Result<Commit, Box<dyn Error>> {
         sha: commit_and_title.next().unwrap().to_string(),
         title: commit_and_title.next().unwrap().to_string(),
     });
-}
-
-impl Commit {
-    pub fn commit_body(self) -> Result<String, Box<dyn Error>> {
-        return lookup_commit(self.sha, String::from("%b"));
-    }
 }
 
 fn lookup_commit(sha: String, format: String) -> Result<String, Box<dyn Error>> {
@@ -49,18 +53,26 @@ mod tests {
 
     use super::{last_commit_sha, Commit};
 
-
     #[test]
     fn test_last_commit_sha() {
         env::set_var("GIT_DIR", "./fixtures/simple.git");
         let commit = last_commit_sha().expect("should not fail");
-        assert_eq!(commit, Commit{sha: String::from("9233473ecfc9e45a58b1184dbe9da9758d51ab63"), title: String::from("title")})
+        assert_eq!(
+            commit,
+            Commit {
+                sha: String::from("9233473ecfc9e45a58b1184dbe9da9758d51ab63"),
+                title: String::from("title")
+            }
+        )
     }
 
     #[test]
     fn test_commit_body() {
         env::set_var("GIT_DIR", "./fixtures/simple.git");
-        let commit_body = last_commit_sha().expect("should not fail").commit_body().expect("should not fail");
+        let commit_body = last_commit_sha()
+            .expect("should not fail")
+            .commit_body()
+            .expect("should not fail");
         assert_eq!(commit_body, String::from("multi line\n\nend\n"))
     }
 }
