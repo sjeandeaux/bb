@@ -2,12 +2,15 @@
 // curl -u <username>:$BITBUCKET_API_TOKEN https://<hostname>/rest/io.reconquest.bitbucket.labels/1.0/<PROJECT_ID>/<REPO_ID>/pull-requests/<PP_ID> -d "name=<LABEL>" -H "Content-Type: application/x-www-form-urlencoded" -X POST -H "X-Atlassian-Token: no-check"
 //
 
-use git::git::last_commit_sha;
-
-mod api;
-mod git;
 fn main() {
-    let commit = last_commit_sha().expect("error");
-
-    println!("{:?} {:?}", (&commit), (&commit).commit_body())
+  let cmd = clap::Command::new("bb")
+        .bin_name("bb")
+        .subcommand_required(true)
+        .subcommand(clap::Command::new("pr").subcommand_required(true).subcommand(clap::SubCommand::with_name("create")));
+    let matches = cmd.get_matches();
+    let matches = match matches.subcommand() {
+        Some(("pr", matches)) => matches,
+        _ => unreachable!("clap should ensure we don't get here"),
+    };
+    println!("{:?}", matches);
 }

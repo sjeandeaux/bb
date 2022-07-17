@@ -10,7 +10,7 @@ pub struct Client {
 
 impl Client {
     // TODO refactoring argument(s)
-    pub fn endpoint_pull_request(&self, pull_request: &PullRequest) -> String {
+    fn endpoint_pull_request(&self, pull_request: &PullRequest) -> String {
         return format!("{protocol}://{hostname}/rest/api/1.0/projects/{project}/repos/{repository}/pull-requests", 
                             protocol = self.protocol.as_ref().unwrap_or(&String::from("https")),
                             hostname = self.hostname,
