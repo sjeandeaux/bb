@@ -3,17 +3,38 @@
 //
 
 fn main() {
-  let cmd = clap::Command::new("bb")
+    let cmd = clap::Command::new("bb")
         .bin_name("bb")
         .subcommand_required(true)
         .subcommand(pr_command());
     let principale = cmd.get_matches();
     match principale.subcommand() {
-        Some(("pr", pr_command)) => println!("pr: {:?}", pr_command.subcommand()),
+        Some(("pr", pr_command)) => pr_actions(pr_command),
         _ => unreachable!("clap should ensure we don't get here"),
     };
 }
 
+fn pr_actions(pr_command: &clap::ArgMatches) -> () {
+    match pr_command.subcommand() {
+        Some(("create", create_command)) => pr_create_action(create_command),
+        _ => unreachable!("clap should ensure we don't get here"),
+    }
+}
+
+fn pr_create_action(create_command: &clap::ArgMatches) {
+    if !create_command.is_present("fill") {
+        todo!("should be handled")
+    }
+    println!("{:?}", create_command)
+}
+
 fn pr_command() -> clap::Command<'static> {
- clap::Command::new("pr").about("Manage pull requests").subcommand_required(true).subcommand(clap::SubCommand::with_name("create").about("Create a pull request").arg(clap::Arg::with_name("fill")))
+    clap::Command::new("pr")
+        .about("Manage pull requests")
+        .subcommand_required(true)
+        .subcommand(
+            clap::SubCommand::with_name("create")
+                .arg(clap::Arg::with_name("fill").long("fill").short('f'))
+                .about("Create a pull request"),
+        )
 }
