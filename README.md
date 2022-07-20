@@ -4,6 +4,7 @@
 
 - [] best practices (unit tests, comment, ...)
 - [] borrow or not borrow 
+- [] clap usage 
 
 ## Technology
 
