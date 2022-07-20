@@ -1,16 +1,30 @@
 use super::repository::Reference;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PullRequest {
     pub title: String,
-    pub description: String,
-    pub state: bool,
+    pub description: Option<String>,
+    pub state: Option<String>,
     pub closed: bool,
     pub locked: bool,
     pub from_ref: Reference,
     pub to_ref: Reference,
+    pub links: Option<Links>,
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Links {
+    pub _self: Vec<Link>     
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Link {
+    pub href: String
 }
 
 #[cfg(test)]
@@ -22,8 +36,9 @@ mod tests {
     fn pull_request_serialize() {
         let pr = PullRequest {
             title: String::from("title"),
-            description: String::from("description"),
-            state: true,
+            description: Some(String::from("description")),
+            links: None,
+            state: None,
             closed: false,
             locked: false,
             from_ref: Reference {
@@ -48,7 +63,7 @@ mod tests {
             },
         };
         let pr_in_json = serde_json::to_string(&pr).unwrap();
-        let expected = r#"{"title":"title","description":"description","state":true,"closed":false,"locked":false,"fromRef":{"id":"from_id","repository":{"slug":"from_slug","name":null,"project":{"key":"from_key"}}},"toRef":{"id":"to_id","repository":{"slug":"to_slug","name":null,"project":{"key":"to_key"}}}}"#;
+        let expected = r#"{"title":"title","description":"description","closed":false,"locked":false,"fromRef":{"id":"from_id","repository":{"slug":"from_slug","name":null,"project":{"key":"from_key"}}},"toRef":{"id":"to_id","repository":{"slug":"to_slug","name":null,"project":{"key":"to_key"}}}}"#;
         assert_eq!(expected, pr_in_json);
     }
 }

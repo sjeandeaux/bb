@@ -1,4 +1,6 @@
 use super::pull_request::PullRequest;
+use regex::Regex;
+use reqwest::Response;
 
 pub struct Client {
     pub protocol: Option<String>,
@@ -9,6 +11,16 @@ pub struct Client {
 }
 
 impl Client {
+    pub fn new(url: String, username: String, token: String) -> Self {
+        let re = Regex::new(r"(http.?)://(.*)/scm/(.*)/(.*)\.git").unwrap();
+        let caps = re.captures(&url).unwrap();
+        Self {
+            protocol: caps.get(1).map(|v| v.as_str().to_string()),
+            hostname: caps.get(2).map(|v| v.as_str().to_string()).unwrap(),
+            username,
+            token,
+        }
+    }
     // TODO refactoring argument(s)
     fn endpoint_pull_request(&self, pull_request: &PullRequest) -> String {
         return format!("{protocol}://{hostname}/rest/api/1.0/projects/{project}/repos/{repository}/pull-requests", 
@@ -21,18 +33,14 @@ impl Client {
     pub async fn create_pull_request(
         &self,
         pull_request: &PullRequest,
-    ) -> Result<PullRequest, reqwest::Error> {
+    ) -> Result<Response, reqwest::Error> {
         let client = reqwest::Client::new();
-        let res: PullRequest = client
+        return client
             .post(self.endpoint_pull_request(pull_request))
             .basic_auth(&self.username, Some(&self.token))
-            .json(&pull_request)
+            .json(pull_request)
             .send()
-            .await?
-            .json()
-            .await?;
-
-        return Ok(res);
+            .await;
     }
 }
 
@@ -53,11 +61,11 @@ mod tests {
             username: String::from("username"),
             token: String::from("token"),
         };
-        // TODO rust and factory ???
         let pr = PullRequest {
             title: String::from("title"),
-            description: String::from("description"),
-            state: true,
+            links: None,
+            description: Some(String::from("description")),
+            state: None,
             closed: false,
             locked: false,
             from_ref: Reference {

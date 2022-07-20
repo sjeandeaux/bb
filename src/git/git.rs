@@ -13,7 +13,7 @@ impl Commit {
     /// # Examples
     ///
     /// ```
-    /// use 
+    /// use
     /// ```
     pub fn commit_body(&self) -> Result<String, Box<dyn Error>> {
         let sha = &(self).sha;
@@ -29,6 +29,33 @@ pub fn last_commit_sha() -> Result<Commit, Box<dyn Error>> {
         sha: commit_and_title.next().unwrap().to_string(),
         title: commit_and_title.next().unwrap().to_string(),
     });
+}
+
+pub fn current_branch() -> Result<String, Box<dyn Error>> {
+    let output = Command::new("git")
+        .arg("symbolic-ref")
+        .arg("HEAD")
+        .output()?;
+
+    if output.status.success() {
+        let stdout = String::from_utf8(output.stdout).unwrap();
+        return Ok(stdout);
+    }
+    return Err("fail to execute git".into());
+}
+
+pub fn get_remote_origin_url() -> Result<String, Box<dyn Error>> {
+    let output = Command::new("git")
+        .arg("config")
+        .arg("--get")
+        .arg("remote.origin.url")
+        .output()?;
+
+    if output.status.success() {
+        let stdout = String::from_utf8(output.stdout).unwrap();
+        return Ok(stdout);
+    }
+    return Err("fail to execute git".into());
 }
 
 fn lookup_commit(sha: String, format: String) -> Result<String, Box<dyn Error>> {
@@ -52,7 +79,7 @@ fn lookup_commit(sha: String, format: String) -> Result<String, Box<dyn Error>> 
 mod tests {
     use std::env;
 
-    use super::{last_commit_sha, Commit};
+    use super::{current_branch, get_remote_origin_url, last_commit_sha, Commit};
 
     #[test]
     fn test_last_commit_sha() {
@@ -67,6 +94,19 @@ mod tests {
         )
     }
 
+    #[test]
+    fn test_current_branch() {
+        env::set_var("GIT_DIR", "./fixtures/simple.git");
+        let branch = current_branch().expect("should not fail");
+        assert_eq!(branch, String::from("refs/heads/master\n"))
+    }
+
+    #[test]
+    fn test_get_remote_origin_url() {
+        env::set_var("GIT_DIR", "./fixtures/simple.git");
+        let branch = get_remote_origin_url().expect("should not fail");
+        assert_eq!(branch, String::from("simple.git\n"))
+    }
     #[test]
     fn test_commit_body() {
         env::set_var("GIT_DIR", "./fixtures/simple.git");
