@@ -60,11 +60,12 @@ async fn pr_create_action(create_command: &clap::ArgMatches) -> Result<Response,
             .to_string(),
     );
 
+    let remote_url = get_remote_origin_url().expect("missing remote url");
     let repository_from = api::bitbucket::v1::repository::Repository::new(
-        get_remote_origin_url().expect("missing remote url"),
+        remote_url.clone(),
     );
     let repository_to = api::bitbucket::v1::repository::Repository::new(
-        get_remote_origin_url().expect("missing remote url"),
+        remote_url.clone(),
     );
 
     let pr = api::bitbucket::v1::pull_request::PullRequest {
@@ -89,8 +90,6 @@ async fn pr_create_action(create_command: &clap::ArgMatches) -> Result<Response,
             repository: repository_to,
         },
     };
-    println!("{:?}", pr);
-
     client.create_pull_request(&pr).await
 }
 

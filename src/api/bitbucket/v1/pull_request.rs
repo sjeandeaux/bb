@@ -63,7 +63,7 @@ mod tests {
             },
         };
         let pr_in_json = serde_json::to_string(&pr).unwrap();
-        let expected = r#"{"title":"title","description":"description","closed":false,"locked":false,"fromRef":{"id":"from_id","repository":{"slug":"from_slug","name":null,"project":{"key":"from_key"}}},"toRef":{"id":"to_id","repository":{"slug":"to_slug","name":null,"project":{"key":"to_key"}}}}"#;
+        let expected = r#"{"title":"title","description":"description","state":null,"closed":false,"locked":false,"fromRef":{"id":"from_id","repository":{"slug":"from_slug","name":null,"project":{"key":"from_key"}}},"toRef":{"id":"to_id","repository":{"slug":"to_slug","name":null,"project":{"key":"to_key"}}},"links":null}"#;
         assert_eq!(expected, pr_in_json);
     }
 }
