@@ -27,6 +27,9 @@ async fn main() {
                 StatusCode::CONFLICT => {
                     println!("pr already exists");
                 }
+                StatusCode::NOT_FOUND => {
+                    println!("branch does not exist on remote");
+                }
                 s => println!("{} {}", s,  std::str::from_utf8(&r.bytes().await.unwrap()).unwrap())
             }
                             
