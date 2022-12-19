@@ -24,6 +24,9 @@ async fn main() {
                     let pr = r.json::<PullRequest>().await.unwrap();
                     println!("{}", pr.links.expect("missing link")._self.first().expect("missing href").href);
                 }
+                StatusCode::CONFLICT => {
+                    println!("pr already exists");
+                }
                 s => println!("{} {}", s,  std::str::from_utf8(&r.bytes().await.unwrap()).unwrap())
             }
                             
@@ -42,7 +45,6 @@ async fn pr_actions(pr_command: &clap::ArgMatches) -> Result<Response, Error> {
 async fn pr_create_action(create_command: &clap::ArgMatches) -> Result<Response, Error> {
     let last_commit = last_commit_sha().expect("git error");
 
-    //TODO those information should come from git
     let client = api::bitbucket::v1::client::Client::new(
         get_remote_origin_url().expect("missing remote url"),
         create_command
@@ -73,7 +75,7 @@ async fn pr_create_action(create_command: &clap::ArgMatches) -> Result<Response,
             id: format!(
                 "refs/heads/{branch}",
                 branch = create_command
-                    .get_one::<String>("branch")
+                    .get_one::<String>("from-branch")
                     .expect("missing branch")
                     .to_string()
             ),
@@ -107,9 +109,9 @@ fn pr_command() -> clap::Command {
                         .action(ArgAction::Set),
                 )
                 .arg(
-                    clap::Arg::new("branch")
-                        .long("branch")
-                        .default_value("develop"),
+                    clap::Arg::new("from-branch")
+                        .long("from-branch")
+                        .default_value("main"),
                 )
                 .about("Create a pull request"),
         )
