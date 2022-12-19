@@ -38,7 +38,8 @@ pub fn current_branch() -> Result<String, Box<dyn Error>> {
         .output()?;
 
     if output.status.success() {
-        let stdout = String::from_utf8(output.stdout).unwrap();
+        let mut stdout = String::from_utf8(output.stdout).unwrap();
+        stdout.pop();
         return Ok(stdout);
     }
     return Err("fail to execute git".into());
@@ -52,7 +53,8 @@ pub fn get_remote_origin_url() -> Result<String, Box<dyn Error>> {
         .output()?;
 
     if output.status.success() {
-        let stdout = String::from_utf8(output.stdout).unwrap();
+        let mut stdout = String::from_utf8(output.stdout).unwrap();
+        stdout.pop();
         return Ok(stdout);
     }
     return Err("fail to execute git".into());
@@ -98,14 +100,14 @@ mod tests {
     fn test_current_branch() {
         env::set_var("GIT_DIR", "./fixtures/simple.git");
         let branch = current_branch().expect("should not fail");
-        assert_eq!(branch, String::from("refs/heads/master\n"))
+        assert_eq!(branch, String::from("refs/heads/master"))
     }
 
     #[test]
     fn test_get_remote_origin_url() {
         env::set_var("GIT_DIR", "./fixtures/simple.git");
         let branch = get_remote_origin_url().expect("should not fail");
-        assert_eq!(branch, String::from("simple.git\n"))
+        assert_eq!(branch, String::from("simple.git"))
     }
     #[test]
     fn test_commit_body() {

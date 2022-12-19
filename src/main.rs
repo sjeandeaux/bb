@@ -89,6 +89,7 @@ async fn pr_create_action(create_command: &clap::ArgMatches) -> Result<Response,
             repository: repository_to,
         },
     };
+    println!("{:?}", pr);
 
     client.create_pull_request(&pr).await
 }
