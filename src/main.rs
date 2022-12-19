@@ -25,7 +25,7 @@ async fn main() {
                     println!("{}", pr.links.expect("missing link")._self.first().expect("missing href").href);
                 }
                 StatusCode::CONFLICT => {
-                    println!("pr already exists");
+                    println!("pr already exists {}", std::str::from_utf8(&r.bytes().await.unwrap()).unwrap());
                 }
                 StatusCode::NOT_FOUND => {
                     println!("branch does not exist on remote");
@@ -75,17 +75,17 @@ async fn pr_create_action(create_command: &clap::ArgMatches) -> Result<Response,
         closed: false,
         locked: false,
         from_ref: api::bitbucket::v1::repository::Reference {
-            id: format!(
-                "refs/heads/{branch}",
-                branch = create_command
-                    .get_one::<String>("from-branch")
-                    .expect("missing branch")
-                    .to_string()
-            ),
+            id: current_branch().expect("unable to get the current branch"),
             repository: repository_from,
         },
         to_ref: api::bitbucket::v1::repository::Reference {
-            id: current_branch().expect("unable to get the current branch"),
+            id: format!(
+                "refs/heads/{branch}",
+                branch = create_command
+                    .get_one::<String>("to-branch")
+                    .expect("missing branch")
+                    .to_string()
+            ),
             repository: repository_to,
         },
     };
@@ -113,8 +113,8 @@ fn pr_command() -> clap::Command {
                         .action(ArgAction::Set),
                 )
                 .arg(
-                    clap::Arg::new("from-branch")
-                        .long("from-branch")
+                    clap::Arg::new("to-branch")
+                        .long("to-branch")
                         .default_value("main"),
                 )
                 .about("Create a pull request"),

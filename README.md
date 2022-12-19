@@ -26,7 +26,7 @@ It takes the latest commit to fill title and desciption.
 
 export BB_USERNAME=<>
 export BB_TOKEN=<>
-bb pr create --from-branch develop
+bb pr create --to-branch develop
 
 
 bb pr create --username <> --token <>
